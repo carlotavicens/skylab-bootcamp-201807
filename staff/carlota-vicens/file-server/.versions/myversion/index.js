@@ -29,7 +29,7 @@ app.get('/files', (req, res) => {
     </head>
     <body>
         <ul>
-            ${files.map(file => `<li>${file}</li>`).join('')}
+            ${files.map(file => `<li><a href='/download?file=${file}'>${file}</a> <a href='/delete?file=${file}'> <button> delete</button> </a></li>`).join('')}
         </ul>
 
         <form action="/files" method="post" encType="multipart/form-data">
@@ -38,6 +38,7 @@ app.get('/files', (req, res) => {
         </form>
     </body>
 </html>`)
+
 })
 
 app.post('/files', (req, res) => {
@@ -49,6 +50,24 @@ app.post('/files', (req, res) => {
 
         res.redirect('/files')
     });
+})
+
+app.get('/download', (req, res) => {
+    const file = req.query.file
+    var file_upload = __dirname + `/files/${file}`;
+    res.download(file_upload); // Set disposition and send it.
+
+})
+
+app.get('/delete', (req, res) => {
+    const file = req.query.file
+    fs.unlinkSync(__dirname+ `/files/${file}`, function (err) {            
+        if (err) {                                                
+            console.error(err);                                    
+        }                                                          
+       console.log('File has been Deleted');                          
+    });
+    res.redirect('/files')
 })
 
 app.listen(port, () => console.log(`${package.name} ${package.version} up and running on port ${port}`))
